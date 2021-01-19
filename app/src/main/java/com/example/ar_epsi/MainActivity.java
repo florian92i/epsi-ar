@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
 
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         if (!checkIsSupportedDeviceOrFinish(this)) {
             return;
@@ -45,10 +47,12 @@ public class MainActivity extends AppCompatActivity {
         /*
         Ensuite , nous utilisons la classe ModelRenderable pour créer notre modèle.
         Avec l'aide de la méthode setSource, nous créons charger notre modèle à partir du. sfb qui a été généré lorsque nous avons importé les actifs,
-        la méthode thenAccept reçoit le modèle une fois qu'il est construit et nous définissons le modèle chargé sur notre lampPostRenderable.
+        la méthode thenAccept reçoit le modèle une fois qu'il est construit et nous définissons le modèle chargé sur notre lampPostRenderable. Piano.gltf
          */
+        System.out.println("Le message ici ---------------------------");
+        System.out.println(Environment.getExternalStorageDirectory().getAbsolutePath());
         ModelRenderable.builder()
-                .setSource(this, Uri.parse("../../sampledata/Piano.gltf"))
+                .setSource(this, Uri.parse("Mesh_Rhinoceros.sfb"))
                 .build()
                 .thenAccept(renderable -> lampPostRenderable = renderable)
                 .exceptionally(throwable -> {
@@ -107,5 +111,7 @@ TransformableNode : C'est un nœud avec lequel interagir. Il peut être déplac�
         }
         return true;
     }
+
+
 }
 
