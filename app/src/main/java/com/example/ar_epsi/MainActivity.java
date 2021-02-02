@@ -97,8 +97,14 @@ public class MainActivity extends AppCompatActivity {
                         //image.getPlanes()[0].getBuffer(), image.getPlanes()[1].getBuffer()
                         //image.getPlanes()[2].getBuffer(), image.getWidth(), image.getHeight()
 
-                        byte[] nv21 = YUV_420_888toNV(imageAcquire.getPlanes()[0].getBuffer(), imageAcquire.getPlanes()[0].getBuffer(), imageAcquire.getPlanes()[0].getBuffer(), false);
-                        byte[] jpeg = NV21toJPEG(nv21, 300, 300, 100);
+
+                        System.out.println(imageAcquire.getWidth());
+                        System.out.println(imageAcquire.getHeight());
+
+                        byte[] nv21 = convertYUV420ToN21(imageAcquire);
+                        byte[] jpeg = convertN21ToJpeg(nv21, 640, 480);
+                        // width X = 640
+                        // heigh Y = 480
                         imageAcquire.close();
                         // ECRIRE DANS UN FICHIER
                         Bitmap bitmapImage = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length, null);
@@ -118,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    System.out.println("----------- TAille augmented image----------------");
                     System.out.println(augmentedImage.getExtentX());
                     System.out.println(augmentedImage.getExtentZ());
                     System.out.println(augmentedImage.getCenterPose());
@@ -165,32 +172,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // convertisseur d'image
-    public static byte[] NV21toJPEG(byte[] nv21, int width, int height, int quality) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
-        yuv.compressToJpeg(new Rect(0, 0, width, height), quality, out);
-        return out.toByteArray();
+    private byte[] convertN21ToJpeg(byte[] bytesN21, int w, int h) {
+        byte[] rez = new byte[0];
+
+        YuvImage yuv_image = new YuvImage(bytesN21, ImageFormat.NV21, w, h, null);
+        Rect rect = new Rect(0, 0, w, h);
+        ByteArrayOutputStream output_stream = new ByteArrayOutputStream();
+        yuv_image.compressToJpeg(rect, 100, output_stream);
+        rez = output_stream.toByteArray();
+
+        return rez;
     }
 
-    // nv12: true = NV12, false = NV21
-    public static byte[] YUV_420_888toNV(ByteBuffer yBuffer, ByteBuffer uBuffer, ByteBuffer vBuffer, boolean nv12) {
-        byte[] nv;
+    private byte[] convertYUV420ToN21(Image imgYUV420) {
+        byte[] rez = new byte[0];
 
-        int ySize = yBuffer.remaining();
-        int uSize = uBuffer.remaining();
-        int vSize = vBuffer.remaining();
+        ByteBuffer buffer0 = imgYUV420.getPlanes()[0].getBuffer();
+        ByteBuffer buffer2 = imgYUV420.getPlanes()[2].getBuffer();
+        int buffer0_size = buffer0.remaining();
+        int buffer2_size = buffer2.remaining();
+        rez = new byte[buffer0_size + buffer2_size];
 
-        nv = new byte[ySize + uSize + vSize];
+        buffer0.get(rez, 0, buffer0_size);
+        buffer2.get(rez, buffer0_size, buffer2_size);
 
-        yBuffer.get(nv, 0, ySize);
-        if (nv12) {//U and V are swapped
-            vBuffer.get(nv, ySize, vSize);
-            uBuffer.get(nv, ySize + vSize, uSize);
-        } else {
-            uBuffer.get(nv, ySize , uSize);
-            vBuffer.get(nv, ySize + uSize, vSize);
-        }
-        return nv;
+        return rez;
     }
 
     private void createDirectoryAndSaveFile(Bitmap imageToSave, String fileName) {
@@ -229,5 +235,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (final Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static BufferedImage cropImage(BufferedImage bufferedImage, int x, int y, int width, int height){
+    BufferedImage croppedImage = bufferedImage.getSubimage(x, y, width, height);
+    return croppedImage;
     }
 }
