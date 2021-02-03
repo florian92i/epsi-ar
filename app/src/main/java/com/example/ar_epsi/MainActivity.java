@@ -63,7 +63,16 @@ public class MainActivity extends AppCompatActivity {
         ModelRenderable.builder()
                 .setSource(arFragment.getContext(), uri)
                 .build()
-                .thenAccept(modelRenderable -> addNodeToScene(arFragment, anchor, modelRenderable))
+                .thenAccept(modelRenderable -> {
+                    System.out.println("----------- COLOR ----------------");
+                    ModelRenderable blueSphereRenderable = modelRenderable.makeCopy();
+                    blueSphereRenderable.getMaterial(0).setFloat3("zone1Color", 1.00f, 1.00f, 1.00f);
+                    blueSphereRenderable.getMaterial(1).setFloat3("zone1Color", 0.00f, 0.00f, 0.00f);
+                    blueSphereRenderable.getMaterial(2).setFloat3("zone1Color", 1.00f, 1.00f, 1.00f);
+                    blueSphereRenderable.getMaterial(4).setFloat3("zone1Color", 0.00f, 0.00f, 0.00f);
+                    blueSphereRenderable.getMaterial(5).setFloat3("zone1Color", 1.00f, 1.00f, 1.00f);
+                    addNodeToScene(arFragment, anchor, blueSphereRenderable);
+                })
                 .exceptionally(throwable -> {
                             Toast.makeText(arFragment.getContext(), "Error:" + throwable.getMessage(), Toast.LENGTH_LONG).show();
                             return null;
@@ -121,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    placeObject(arFragment, augmentedImage.createAnchor(augmentedImage.getCenterPose()), Uri.parse("Mesh_Rhinoceros.sfb"));
+                    placeObject(arFragment, augmentedImage.createAnchor(augmentedImage.getCenterPose()), Uri.parse("Rhinoceros.sfb"));
                     shouldAddModel = false;
                     // à voir pour ça pour rajouter des models
                 }
@@ -145,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
     // permet de charger l'image de référence
     // error si on charge pas
     private Bitmap loadAugmentedImage() {
-        try (InputStream is = getAssets().open("bebe-rhinoceros.png")) {
+        try (InputStream is = getAssets().open("test.png")) {
             return BitmapFactory.decodeStream(is);
         } catch (IOException e) {
             Log.e("ImageLoad", "IO Exception", e);
