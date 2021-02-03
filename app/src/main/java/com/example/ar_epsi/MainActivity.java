@@ -109,9 +109,6 @@ public class MainActivity extends AppCompatActivity {
                         // ECRIRE DANS UN FICHIER
                         Bitmap bitmapImage = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length, null);
                         createDirectoryAndSaveFile(bitmapImage, "toto.jpeg");
-                        System.out.println("----------tail image------ ");
-                        System.out.println(bitmapImage.getWidth());
-                        System.out.println(bitmapImage.getHeight());
                         int pixel = bitmapImage.getPixel(12,35);
                         int redValue = Color.red(pixel);
                         int greenValue = Color.green(pixel);
@@ -124,11 +121,6 @@ public class MainActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    System.out.println("----------- TAille augmented image----------------");
-                    System.out.println(augmentedImage.getExtentX());
-                    System.out.println(augmentedImage.getExtentZ());
-                    System.out.println(augmentedImage.getCenterPose());
-                    System.out.println("---------------------------");
                     placeObject(arFragment, augmentedImage.createAnchor(augmentedImage.getCenterPose()), Uri.parse("Mesh_Rhinoceros.sfb"));
                     shouldAddModel = false;
                     // à voir pour ça pour rajouter des models
@@ -153,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
     // permet de charger l'image de référence
     // error si on charge pas
     private Bitmap loadAugmentedImage() {
-        try (InputStream is = getAssets().open("imageTestBlanc.png")) {
+        try (InputStream is = getAssets().open("bebe-rhinoceros.png")) {
             return BitmapFactory.decodeStream(is);
         } catch (IOException e) {
             Log.e("ImageLoad", "IO Exception", e);
@@ -235,10 +227,5 @@ public class MainActivity extends AppCompatActivity {
         } catch (final Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static BufferedImage cropImage(BufferedImage bufferedImage, int x, int y, int width, int height){
-    BufferedImage croppedImage = bufferedImage.getSubimage(x, y, width, height);
-    return croppedImage;
     }
 }
