@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -59,10 +60,10 @@ public class MainActivity extends AppCompatActivity {
         register(()-> {
             try {
                 // image naming and path  to include sd card  appending name you choose for file
-                String mPath = Environment.getExternalStorageDirectory().toString() + "/" + "toto" + ".jpg";
+                String mPath = Environment.getExternalStorageDirectory().toString() + "/" + "screenShoot.jpeg";
 
                 // create bitmap screen capture
-                View v1 = getWindow().getDecorView().getRootView();
+                View v1 = getWindow().getDecorView().findViewById(R.id.sceneform_fragment).getRootView();
                 v1.setDrawingCacheEnabled(true);
                 Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
                 v1.setDrawingCacheEnabled(false);
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 File imageFile = new File(mPath);
 
                 FileOutputStream outputStream = new FileOutputStream(imageFile);
-                int quality = 20;
+                int quality = 90;
                 bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
                 outputStream.flush();
                 outputStream.close();
@@ -82,11 +83,11 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-            sharingIntent.setType("image/jpg");
             String shareSub = "Partager votre photo";
+            sharingIntent.setType("image/*");
             sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, shareSub);
             sharingIntent.putExtra(Intent.EXTRA_TEXT, "body text");
-            sharingIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(Environment.getExternalStorageDirectory().toString() + "/" + "toto" + ".jpg"));
+            sharingIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(Environment.getExternalStorageDirectory().toString() + "/" + "screenShoot" + ".jpeg"));
             startActivity(Intent.createChooser(sharingIntent, "Share using"));
         });
         arFragment.getPlaneDiscoveryController().hide();
