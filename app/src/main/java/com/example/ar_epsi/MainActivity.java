@@ -136,24 +136,14 @@ public class MainActivity extends AppCompatActivity {
         for (AugmentedImage augmentedImage : augmentedImages) {
             if (augmentedImage.getTrackingState() == TrackingState.TRACKING) {
 
-                if (augmentedImage.getName().equals("rhino") && shouldAddModel) {
+                if (augmentedImage.getName().equals("rhino") || augmentedImage.getName().equals("singe") && shouldAddModel) {
                     System.out.println("---------------------------");
                     try {
 
                         //augmentedImage
-                        System.out.println("PASSE LA");
                         Image imageAcquire = frame.acquireCameraImage(); // ici faut passer la bonne taille d'image qui correpond à notre photo
-                        System.out.println("X");
-                        System.out.println(augmentedImage.getExtentX());
-                        System.out.println("Z");
-                        System.out.println(augmentedImage.getExtentZ());
-                        System.out.println("Center ^pose");
-                        System.out.println(Arrays.toString(augmentedImage.getCenterPose().getXAxis()));
-                        System.out.println(Arrays.toString(augmentedImage.getCenterPose().getYAxis()));
                         byte[] nv21 = convertYUV420ToN21(imageAcquire);
                         byte[] jpeg = convertN21ToJpeg(nv21, 640, 480);
-                        // width X = 640
-                        // heigh Y = 480
                         imageAcquire.close();
                         // ECRIRE DANS UN FICHIER
                         Bitmap bitmapImage = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length, null);
@@ -166,7 +156,8 @@ public class MainActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    placeObject(arFragment, augmentedImage.createAnchor(augmentedImage.getCenterPose()), Uri.parse("Rhinoceros.sfb"));
+                    if (augmentedImage.getName().equals("singe")) placeObject(arFragment, augmentedImage.createAnchor(augmentedImage.getCenterPose()), Uri.parse("Singe.sfb"));
+                    else placeObject(arFragment, augmentedImage.createAnchor(augmentedImage.getCenterPose()), Uri.parse("Rhinoceros.sfb"));
                     shouldAddModel = false;
                     // à voir pour ça pour rajouter des models
                 }
@@ -176,21 +167,23 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean setupAugmentedImagesDb(Config config, Session session) {
         AugmentedImageDatabase augmentedImageDatabase;
-        Bitmap bitmap = loadAugmentedImage();
-        if (bitmap == null) {
+        Bitmap bitmapTest = loadAugmentedImage("test.png");
+        Bitmap bitmapSinge = loadAugmentedImage("singe.png");
+        if (bitmapTest == null && bitmapSinge == null) {
             return false;
         }
 
         augmentedImageDatabase = new AugmentedImageDatabase(session);
-        augmentedImageDatabase.addImage("rhino", bitmap);
+        augmentedImageDatabase.addImage("rhino", bitmapTest);
+        augmentedImageDatabase.addImage("singe", bitmapSinge);
         config.setAugmentedImageDatabase(augmentedImageDatabase);
         return true;
     }
 
     // permet de charger l'image de référence
     // error si on charge pas
-    private Bitmap loadAugmentedImage() {
-        try (InputStream is = getAssets().open("test.png")) {
+    private Bitmap loadAugmentedImage(String nameImage) {
+        try (InputStream is = getAssets().open(nameImage)) {
             return BitmapFactory.decodeStream(is);
         } catch (IOException e) {
             Log.e("ImageLoad", "IO Exception", e);
