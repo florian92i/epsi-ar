@@ -196,6 +196,8 @@ public class MainActivity extends AppCompatActivity {
         AnchorNode anchorNode = new AnchorNode(anchor);
         TransformableNode node = new TransformableNode(arFragment.getTransformationSystem());
         node.setRenderable(renderable);
+        node.getScaleController().setMaxScale(0.04f);
+        node.getScaleController().setMinScale(0.02f);
         node.setParent(anchorNode);
         arFragment.getArSceneView().getScene().addChild(anchorNode);
         node.select();
